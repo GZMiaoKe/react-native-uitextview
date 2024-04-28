@@ -59,7 +59,7 @@ class RTNCustomMenuTextView: UITextView {
                     body["end"] = end
                 }
                 onSelection(body)
-                self.resignFirstResponder()
+                self.selectedTextRange = nil
             }
         }
     }
