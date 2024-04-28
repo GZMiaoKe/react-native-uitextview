@@ -7,6 +7,7 @@ import {
   TextProps,
   Text as RNText
 } from 'react-native'
+import {TextViewProps} from './types'
 
 export interface RNUITextViewProps extends TextProps {
   children: React.ReactNode
@@ -99,11 +100,7 @@ function UITextViewInner({
   }
 }
 
-export function UITextView(
-  props: TextProps & {
-    uiTextView?: boolean
-  }
-) {
+export function UITextView(props: TextViewProps) {
   // This will never actually get called conditionally, so we don't need
   // to worry about the warning
   // eslint-disable-next-line react-hooks/rules-of-hooks

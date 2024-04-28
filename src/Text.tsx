@@ -8,6 +8,7 @@ import {
   TextProps,
   Text as RNText
 } from 'react-native'
+import {TextViewProps} from './types'
 
 const LINKING_ERROR =
   `The package 'react-native-uitextview' doesn't seem to be linked. Make sure: \n\n` +
@@ -123,11 +124,7 @@ function UITextViewInner({
   }
 }
 
-export function UITextView(
-  props: TextProps & {
-    uiTextView?: boolean
-  }
-) {
+export function UITextView(props: TextViewProps) {
   if (Platform.OS !== 'ios') {
     return <RNText {...props} />
   }
