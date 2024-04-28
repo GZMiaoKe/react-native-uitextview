@@ -22,15 +22,20 @@ class RTNSelectableTextViewManager : ReactTextViewManager() {
 
   @ReactProp(name = "menuItems")
   fun setMenuItems(textView: ReactTextView, items: ReadableArray) {
-    val result: MutableList<String> = ArrayList<String>(items.size())
+    val result: MutableList<Pair<String, String>> = ArrayList(items.size())
     for (i in 0 until items.size()) {
-      result.add(items.getString(i))
+      val pair = items.getMap(i)
+      val key = pair.getString("key")
+      val title = pair.getString("title")
+      if (key != null && title != null) {
+        result.add(Pair(key, title))
+      }
     }
 
     registerSelectionListener(result.toTypedArray(), textView)
   }
 
-  private fun registerSelectionListener(menuItems: Array<String>, view: ReactTextView) {
+  private fun registerSelectionListener(menuItems: Array<Pair<String, String>>, view: ReactTextView) {
     view.customSelectionActionModeCallback = object : ActionMode.Callback {
       override fun onPrepareActionMode(mode: ActionMode?, menu: Menu): Boolean {
         // Called when action mode is first created. The menu supplied
@@ -39,7 +44,8 @@ class RTNSelectableTextViewManager : ReactTextViewManager() {
         // and would override the generated menu items
         menu.clear()
         for (i in menuItems.indices) {
-          menu.add(0, i, 0, menuItems[i])
+          val (_, title) = menuItems[i]
+          menu.add(0, i, 0, title)
         }
         return true
       }
@@ -57,9 +63,10 @@ class RTNSelectableTextViewManager : ReactTextViewManager() {
         val selectionEnd = view.selectionEnd
         val selectedText = view.getText().toString().substring(selectionStart, selectionEnd)
 
+        val (key) = menuItems[item.itemId]
         // Dispatch event
         onSelectNativeEvent(
-          view, menuItems[item.itemId], selectedText, selectionStart, selectionEnd
+          view, key, selectedText, selectionStart, selectionEnd
         )
         mode.finish()
         return true

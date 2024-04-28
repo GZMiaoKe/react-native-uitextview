@@ -19,7 +19,7 @@ class RNUITextView: UIView, UIGestureRecognizerDelegate {
   }
   @objc var onTextLayout: RCTDirectEventBlock?
 
-  @objc var menuItems: [String] = [] {
+    @objc var menuItems: [[String: String]] = [] {
     didSet {
       textView.menuItems = menuItems
     }

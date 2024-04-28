@@ -1,7 +1,7 @@
 let CUSTOM_SELECTOR: String = "_CUSTOM_SELECTOR_"
 
 class RTNCustomMenuTextView: UITextView {
-    var menuItems: [String] = [] {
+    var menuItems: [[String: String]] = [] {
         didSet {
             updateMenuItems()
         }
@@ -14,9 +14,13 @@ class RTNCustomMenuTextView: UITextView {
             return
         }
         menuController.menuItems = menuItems.map { menuItem in
-            let sel = NSString(format: "%@%@", CUSTOM_SELECTOR, menuItem) as String
+            guard let title = menuItem["title"],
+                  let key = menuItem["key"] else {
+                return UIMenuItem()
+            }
+            let sel = NSString(format: "%@%@", CUSTOM_SELECTOR, key) as String
             let selector = NSSelectorFromString(sel)
-            let menuItem = UIMenuItem(title: menuItem, action: selector)
+            let menuItem = UIMenuItem(title: title, action: selector)
             return menuItem
         }
         menuController.update()
@@ -55,6 +59,7 @@ class RTNCustomMenuTextView: UITextView {
                     body["end"] = end
                 }
                 onSelection(body)
+                self.resignFirstResponder()
             }
         }
     }
