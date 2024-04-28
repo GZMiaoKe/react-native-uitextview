@@ -1,6 +1,6 @@
 class RNUITextView: UIView, UIGestureRecognizerDelegate {
   let bridge: RCTBridge
-  let textView: UITextView
+  let textView: RTNCustomMenuTextView
 
   @objc var numberOfLines: Int = 0 {
     didSet {
@@ -19,13 +19,24 @@ class RNUITextView: UIView, UIGestureRecognizerDelegate {
   }
   @objc var onTextLayout: RCTDirectEventBlock?
 
+  @objc var menuItems: [String] = [] {
+    didSet {
+      textView.menuItems = menuItems
+    }
+  }
+  @objc var onSelection: RCTDirectEventBlock? {
+    didSet {
+      textView.onSelection = onSelection
+    }
+  }
+
   init(bridge: RCTBridge) {
     self.bridge = bridge
 
     if #available(iOS 16.0, *) {
-      textView = UITextView(usingTextLayoutManager: false)
+      textView = RTNCustomMenuTextView(usingTextLayoutManager: false)
     } else {
-      textView = UITextView()
+      textView = RTNCustomMenuTextView()
     }
 
     // Disable scrolling
