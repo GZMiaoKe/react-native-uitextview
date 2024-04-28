@@ -1,4 +1,4 @@
-import {
+import type {
   NativeSyntheticEvent,
   TextProps as RNTextProps,
   TargetedEvent,
@@ -6,9 +6,9 @@ import {
 
 export interface TextSelectionData extends TargetedEvent {
   eventType: string;
-  content?: string;
-  start?: number;
-  end?: number;
+  content: string;
+  start: number;
+  end: number;
 }
 
 export interface TextViewProps extends RNTextProps {

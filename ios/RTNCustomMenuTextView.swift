@@ -46,18 +46,19 @@ class RTNCustomMenuTextView: UITextView {
         if #available(iOS 13.0, *) {
             if let cmd = sender as? UICommand,
                let menuItem = cmd.action.matchCustomSelector(),
-               let onSelection = self.onSelection {
+               let onSelection = self.onSelection,
+               let selected = self.selectedTextRange,
+               let selectedText = self.text(in: selected) {
+                
+                let start = self.offset(from: self.beginningOfDocument, to: selected.start)
+                let end = self.offset(from: self.beginningOfDocument, to: selected.end)
+                
                 var body: [String: Any] = [
                     "eventType": menuItem,
+                    "content": selectedText,
+                    "start": start,
+                    "end": end
                 ]
-                if let selected = self.selectedTextRange {
-                    let selectedText = self.text(in: selected)
-                    let start = self.offset(from: self.beginningOfDocument, to: selected.start)
-                    let end = self.offset(from: self.beginningOfDocument, to: selected.end)
-                    body["content"] = selectedText
-                    body["start"] = start
-                    body["end"] = end
-                }
                 onSelection(body)
                 self.selectedTextRange = nil
             }
