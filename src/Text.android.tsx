@@ -1,51 +1,50 @@
-import React from 'react'
+import React from 'react';
+import type { ViewStyle, TextProps } from 'react-native';
 import {
   requireNativeComponent,
   StyleSheet,
   UIManager,
-  ViewStyle,
-  TextProps,
-  Text as RNText
-} from 'react-native'
-import {TextViewProps} from './types'
+  Text as RNText,
+} from 'react-native';
+import type { TextViewProps } from './types';
 
 export interface RNUITextViewProps extends TextProps {
-  children: React.ReactNode
-  style: ViewStyle[]
+  children: React.ReactNode;
+  style: ViewStyle[];
 }
 
 const RNUITextView =
   UIManager.getViewManagerConfig?.('RTNSelectableTextView') != null
     ? requireNativeComponent<RNUITextViewProps>('RTNSelectableTextView')
     : () => {
-        return null
-      }
+        return null;
+      };
 
 const TextAncestorContext = React.createContext<[boolean, ViewStyle]>([
   false,
-  StyleSheet.create({})
-])
+  StyleSheet.create({}),
+]);
 
-const useTextAncestorContext = () => React.useContext(TextAncestorContext)
+const useTextAncestorContext = () => React.useContext(TextAncestorContext);
 
 const textDefaults: TextProps = {
   allowFontScaling: true,
-  selectable: true
-}
+  selectable: true,
+};
 
 function UITextViewInner({
   style,
   children,
   ...rest
 }: TextProps & {
-  uiTextView?: boolean
+  uiTextView?: boolean;
 }) {
-  const [isAncestor, rootStyle] = useTextAncestorContext()
+  const [isAncestor, rootStyle] = useTextAncestorContext();
   // Flatten the styles, and apply the root styles when needed
   const flattenedStyle = React.useMemo(
     () => StyleSheet.flatten([rootStyle, style]),
-    [rootStyle, style]
-  )
+    [rootStyle, style],
+  );
 
   if (!isAncestor) {
     return (
@@ -59,7 +58,7 @@ function UITextViewInner({
           onLongPress={undefined}>
           {React.Children.toArray(children).map((c, index) => {
             if (React.isValidElement(c)) {
-              return c
+              return c;
             } else if (typeof c === 'string' || typeof c === 'number') {
               return (
                 <RNText
@@ -68,20 +67,20 @@ function UITextViewInner({
                   children={c.toString()}
                   {...rest}
                 />
-              )
+              );
             }
 
-            return null
+            return null;
           })}
         </RNUITextView>
       </TextAncestorContext.Provider>
-    )
+    );
   } else {
     return (
       <>
         {React.Children.toArray(children).map((c, index) => {
           if (React.isValidElement(c)) {
-            return c
+            return c;
           } else if (typeof c === 'string' || typeof c === 'number') {
             return (
               <RNText
@@ -90,28 +89,37 @@ function UITextViewInner({
                 children={c.toString()}
                 {...rest}
               />
-            )
+            );
           }
 
-          return null
+          return null;
         })}
       </>
-    )
+    );
   }
 }
 
 export function UITextView(props: TextViewProps) {
   // This will never actually get called conditionally, so we don't need
   // to worry about the warning
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [isAncestor] = useTextAncestorContext()
+  const [isAncestor] = useTextAncestorContext();
 
+  const [selectable, setSelectable] = React.useState(false);
   // Even if the uiTextView prop is set, we can still default to using
   // normal selection (i.e. base RN text) if the text doesn't need to be
   // selectable
   if ((!props.selectable || !props.uiTextView) && !isAncestor) {
-    return <RNText {...props} />
+    return <RNText {...props} />;
   }
 
-  return <UITextViewInner {...props} />
+  return (
+    <UITextViewInner
+      {...props}
+      selectable={selectable}
+      onLayout={e => {
+        props.onLayout?.(e);
+        setSelectable(props.selectable ?? false);
+      }}
+    />
+  );
 }
